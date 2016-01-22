@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# InfileDemo.py
+# InfileDemo3.py
 #
 # Elisa Antolini
 # Jeremy Heyl
@@ -51,12 +51,11 @@ nside=64
 mask=np.zeros(hp.nside2npix(nside))
 i=np.arange(hp.nside2npix(nside))
 decl,ra=IndexToDeclRa(nside,i)
-mask=abs(decl)>10
-#mask=((decl-10)**2+(ra-30)**2)>900
-
+#mask=abs(decl)+(180-abs(ra-180))/12>10
+mask=abs(decl)+abs(ra)/15>12
 if True:
     #Create the pixel map
-    lmax=32
+    lmax=64
     mmax=lmax
     almsize=mmax*(2*lmax+1-mmax)/2+lmax+1
     almmatrix=[]
@@ -83,12 +82,17 @@ else:
 
 
 #Create random map
-lmax2=16
-mmax2=lmax2
-almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
-realrandalm=np.random.uniform(size=almsize2)
-imagrandalm=np.random.uniform(size=almsize2)
-randmap=hp.sphtfunc.alm2map(realrandalm+1j*imagrandalm,nside)
+if False:
+    lmax2=16
+    mmax2=lmax2
+    almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
+    realrandalm=np.random.uniform(size=almsize2)
+    imagrandalm=np.random.uniform(size=almsize2)
+    randmap=hp.sphtfunc.alm2map(realrandalm+1j*imagrandalm,nside)
+else:
+#load galaxy map
+    randmap=hp.read_map("2MPZ.gz_0.031_0.051_smoothed.fits",0)
+    randmap=hp.pixelfunc.ud_grade(randmap,nside_out = nside, order_in = 'RING', order_out = 'RING')
 
 hp.mollview(mask,coord='C',rot = [0,0.3],
             title='Mask', unit='prob', xsize=1024)
@@ -145,6 +149,7 @@ hp.mollview(diffmap,coord='C',rot = [0,0.3],
 hp.graticule()
 plt.savefig("DiffMap.png")
 plt.show()
+
 
 
 
