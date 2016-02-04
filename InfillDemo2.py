@@ -112,7 +112,7 @@ def _main():
     mask=a['mask']
     # calculate nside from the healpix array
     nside=int(np.sqrt(len(mask)/12))
-    alminvmatrix=a['alminvmatrix']
+    almpinvmatrix=a['almpinvmatrix']
     lmax=a['lmax']
     mmax=a['mmax']
     randmap=_CreateRandomMap(16,nside)

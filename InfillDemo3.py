@@ -51,11 +51,14 @@ nside=64
 mask=np.zeros(hp.nside2npix(nside))
 i=np.arange(hp.nside2npix(nside))
 decl,ra=IndexToDeclRa(nside,i)
-#mask=abs(decl)+(180-abs(ra-180))/12>10
-mask=abs(decl)+abs(ra)/15>12
+mask=abs(decl)+(180-abs(ra-180))/12-10
+mask2=np.where(mask>0,np.exp(-0.1/(mask*mask)),0)
+mask=mask2
+#mask=abs(decl)+abs(ra)/15>12
+#mask=abs(decl)>10
 if True:
     #Create the pixel map
-    lmax=64
+    lmax=32
     mmax=lmax
     almsize=mmax*(2*lmax+1-mmax)/2+lmax+1
     almmatrix=[]
@@ -74,15 +77,16 @@ if True:
         maskedmap=mask*map
         almnew=hp.sphtfunc.map2alm(maskedmap,lmax=lmax)
         almmatrix.append(almnew)
-            
-    alminvmatrix=np.conj(np.linalg.inv(almmatrix))
-    np.savez_compressed("maskdata.npz",mask=mask,almmatrix=almmatrix,lmax=lmax,mmax=mmax,alminvmatrix=alminvmatrix)
+
+        # the pseudo inverse is better
+    almpinvmatrix=np.linalg.pinv(np.transpose(almmatrix))
+    np.savez_compressed("maskdata.npz",mask=mask,almmatrix=almmatrix,lmax=lmax,mmax=mmax,almpinvmatrix=almpinvmatrix)
 else:
     pass
 
 
 #Create random map
-if False:
+if True:
     lmax2=16
     mmax2=lmax2
     almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
@@ -122,11 +126,21 @@ hp.graticule()
 plt.savefig("LowPassMaskedRandMap.png")
 plt.show()
 
-# almunmaskedrandmap=np.concatenate((np.dot(almmaskedrandmap[0:len(alminvmatrix)],alminvmatrix),almmaskedrandmap[len(alminvmatrix):]))
-#almunmaskedrandmap=np.dot(almmaskedrandmap[0:len(alminvmatrix)],alminvmatrix)
-almunmaskedrandmap=np.dot(alminvmatrix,almmaskedrandmap[0:len(alminvmatrix)])
-#almunmaskedrandmap=np.dot(almmatrix,almmaskedrandmap[0:len(almmatrix)])
-#almunmaskedrandmap=almmaskedrandmap[0:len(almmatrix)]
+lmax2=lmax
+if lmax2<lmax:
+    mmax2=lmax2
+    almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
+    # truncatedalmmatrix=np.matrix(almmatrix[0:almsize2])
+    # almvector=np.matrix(almmaskedrandmap)
+    # almunmaskedrandmap=np.linalg.pinv(truncatedalmmatrix)*almvector
+    almunmaskedrandmap=np.dot(np.linalg.pinv(np.transpose(almmatrix[0:almsize2])),almmaskedrandmap)
+else:
+    # use the pe
+    # almunmaskedrandmap=np.concatenate((np.dot(almmaskedrandmap[0:len(alminvmatrix)],alminvmatrix),almmaskedrandmap[len(alminvmatrix):]))
+    #almunmaskedrandmap=np.dot(almmaskedrandmap[0:len(alminvmatrix)],alminvmatrix)
+    almunmaskedrandmap=np.dot(almpinvmatrix,almmaskedrandmap)
+    #almunmaskedrandmap=np.dot(almmatrix,almmaskedrandmap[0:len(almmatrix)])
+    #almunmaskedrandmap=almmaskedrandmap[0:len(almmatrix)]
 
 rawunmaskedrandmap=hp.sphtfunc.alm2map(almunmaskedrandmap,nside)
 
