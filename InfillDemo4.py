@@ -51,57 +51,56 @@ def DeclRaToIndex(decl,RA,NSIDE):
 nside=64
 mask=np.zeros(hp.nside2npix(nside))
 i=np.arange(hp.nside2npix(nside))
-decl,ra=IndexToDeclRa(nside,i)
-#mask=(abs(decl)+(180-abs(ra-180))/12-10)>0
-#mask2=np.where(mask>0,np.exp(-0.1/(mask*mask)),0)
-#mask=mask2
-eqfunk=np.vectorize(eq2gal.eq2gal)
-ll,bb=eqfunk(np.radians(ra),np.radians(decl))
-#i=0
-#ll=0*ra
-#bb=0*decl
-#for r,d in zip(ra,decl):
-#  ll[i], bb[i] = eq2gal.eq2gal(r,d)
-#  i=i+1
-  
-ll=np.degrees(ll)
-bb=np.degrees(bb)
-mask=(abs(bb)+(180-abs(ll-180))/12-10)>0
 
 #Create random map
-if True:
+if False:
+    # use RA,Dec coords and mask galaxy
+    decl,ra=IndexToDeclRa(nside,i)
+    eqfunk=np.vectorize(eq2gal.eq2gal)
+    ll,bb=eqfunk(np.radians(ra),np.radians(decl))
+    ll=np.degrees(ll)
+    bb=np.degrees(bb)
+    mask=(abs(bb)+(180-abs(ll-180))/12-15)
+    mask=np.where(mask>0,np.exp(-0.1/(mask*mask)),0)
     lmax2=16
     mmax2=lmax2
     almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
     realrandalm=np.random.uniform(size=almsize2)
     imagrandalm=np.random.uniform(size=almsize2)
     randmap=hp.sphtfunc.alm2map(realrandalm+1j*imagrandalm,nside)
+    maskedrandmap=mask*(randmap+np.random.normal(scale=2,size=len(randmap)))
 else:
 #load galaxy map
+    # use l,b and mask galaxy
+    bb, ll=IndexToDeclRa(nside,i)
+    mask=(abs(bb)+(180-abs(ll-180))/12-15)
+    mask=np.where(mask>0,np.exp(-0.1/(mask*mask)),0)
     randmap=hp.read_map("2MPZ.gz_0.031_0.051_smoothed.fits",0)
     randmap=hp.pixelfunc.ud_grade(randmap,nside_out = nside, order_in = 'RING', order_out = 'RING')
+    meanrandmap=np.mean(randmap)
+#    mask[randmap<1e-2*meanrandmap]=0
+    maskedrandmap=mask*randmap
 
 hp.mollview(mask,coord='C',rot = [0,0.3],
             title='Mask', unit='prob', xsize=1024)
 hp.graticule()
 plt.savefig("Mask.png")
-plt.show()
+# plt.show()
 plt.close()
 
 hp.mollview(randmap,coord='C',rot = [0,0.3],
-            title='RandMap', unit='prob', xsize=1024)
+            title='RandMap', unit='prob', xsize=1024, norm='hist')
 hp.graticule()
 plt.savefig("RandMap.png")
-plt.show()
+# plt.show()
 plt.close()
 
-maskedrandmap=mask*(randmap+np.random.normal(scale=2,size=len(randmap)))
 
 hp.mollview(maskedrandmap,coord='C',rot = [0,0.3],
-            title='MaskedRandMap', unit='prob', xsize=1024)
+            title='MaskedRandMap', unit='prob', xsize=1024, norm='hist')
 hp.graticule()
 plt.savefig("MaskedRandMap.png")
-plt.show()
+# plt.show()
 plt.close()
 
 
@@ -109,14 +108,14 @@ plt.close()
 #
 # NB: there are more feautures than in the original map
 #
-lmax2=20
-mmax2=20
+lmax2=100
+mmax2=100
 almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
 
 #
 # we will threshold and use the strongest features first 
 #
-# Jérôme Bobin, Jean-Luc Starck, Jalal M. Fadili,
+# Jerome Bobin, Jean-Luc Starck, Jalal M. Fadili,
 # Yassir Moudden, and David L. Donoho (2007)
 # Morphological Component Analysis: An Adaptive Thresholding Strategy
 # IEEE TRANSACTIONS ON IMAGE PROCESSING, VOL. 16, NO. 11, 2675
@@ -124,7 +123,7 @@ almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
 # P. Abriala, Y. Mouddena, J.-L. Starck, J. Fadili, J. Delabrouille
 # M.K. Nguyen (2008)
 # CMB data analysis and sparsity
-# Statistical Methodology 5 289–298
+# Statistical Methodology 5 289-298
 #
 # Thresholding scheme (Step 1 in Bobin)
 #
@@ -140,66 +139,75 @@ i=0
 # set initial guess to zero
 yt=0*maskedrandmap
 
-for thresh in np.logspace(-0.5,1):
+for thresh in np.logspace(-3.5,-0.5,2000):
     #
     # calculate residual (Step 2a in Bobin et al)
     #
     # we will use just the residual in the unmasked region
     #
-    
-    rt=maskedrandmap-yt
-    
-    #
-    # calculate coefficients (Step 2b started in Bobin et al)
-    #
-    
-    alphat=hp.sphtfunc.map2alm(mask*rt+yt,lmax=lmax2,mmax=mmax2)
-    absalphat=np.abs(alphat)
-    maxabsalphat=max(absalphat)
-    print ('iteration %d %g %g %g %d' % (i,maxabsalphat,np.sum(absalphat),thresh,int(thresh*almsize2)))
-    
-    #
-    # sort the coefficients from largest to smallest
-    #
-    
-    sortedindex=np.argsort(-absalphat)
-    
-    #
-    # find in the indices of the biggest ones
-    #
 
-    bigvalues=sortedindex[0:int(almsize2*thresh)]
-    alphatnew=0*alphat
+    #
+    # repeat five times with the same number of coefficients to burn in
+    #
+    for j in range(1):
+        rt=maskedrandmap-yt
     
-    #
-    # load the biggest ones into an array with others zeroed out
-    #
+        #
+        # calculate coefficients (Step 2b started in Bobin et al)
+        #
+        if False:
+            alphat=hp.sphtfunc.map2alm(mask*rt+yt,lmax=lmax2,mmax=mmax2)
+        else:
+            alphat=hp.sphtfunc.map2alm(mask*rt+yt)
+            almsize2=len(alphat)
+        
+        absalphat=np.abs(alphat)
+        maxabsalphat=max(absalphat)
+        print ('iteration %d %d %g %g %g %d' % (i,j,maxabsalphat,np.sum(absalphat),thresh,int(thresh*almsize2)))
     
-    alphatnew[bigvalues]=alphat[bigvalues]
+        #
+        # sort the coefficients from largest to smallest
+        #
     
-    #
-    # apply the thresholds (Step 2b finished)
-    #
+        sortedindex=np.argsort(-absalphat)
+    
+        #
+        # find in the indices of the biggest ones
+        #
 
-    alphat=alphatnew
+        bigvalues=sortedindex[0:int(almsize2*thresh)]
+        alphatnew=0*alphat
     
-    #
-    # alphat=np.where(absalphat>thresh,alphat,0)
-    # calculate the next guess
-    #
+        #
+        # load the biggest ones into an array with others zeroed out
+        #
+    
+        alphatnew[bigvalues]=alphat[bigvalues]
+    
+        #
+        # apply the thresholds (Step 2b finished)
+        #
 
-    yt=hp.sphtfunc.alm2map(alphat,nside)
+        alphat=alphatnew
+    
+        #
+        # alphat=np.where(absalphat>thresh,alphat,0)
+        # calculate the next guess
+        #
+
+        yt=hp.sphtfunc.alm2map(alphat,nside)
     
     i=i+1
-    hp.mollview(yt,coord='C',rot = [0,0.3],
-                title='Reconstruction %d' % i, unit='prob', xsize=1024)
-    hp.graticule()
-    plt.savefig("recon_%00d.png" % i)
-    plt.close()
+    if (i % 50 == 0):
+        hp.mollview(yt,coord='C',rot = [0,0.3],
+                    title='Reconstruction %d' % i, unit='prob', xsize=1024, norm='hist')
+        hp.graticule()
+        plt.savefig("recon_%00d.png" % i)
+        plt.close()
 
 diffmap=yt-randmap
 hp.mollview(diffmap,coord='C',rot = [0,0.3],
-            title='DiffMap', unit='prob', xsize=1024)
+            title='DiffMap', unit='prob', xsize=1024, norm='hist')
 hp.graticule()
 plt.savefig("DiffMap.png")
 plt.close()
