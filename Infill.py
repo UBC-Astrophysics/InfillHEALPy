@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# InfillDemo4.py
+# Infill.py
 #
 # Elisa Antolini
 # Jeremy Heyl
@@ -9,7 +9,7 @@
 # This script creates a simple mask and uses the assumption of sparseness
 # in spherical harmonics to infill the mask
 #
-# usage: python InfillDemo4.py
+# usage: python Infill.py
 #
 #
 # Questions: heyl@phas.ubc.ca
@@ -37,81 +37,17 @@ import numpy as np
 import healpy as hp
 import matplotlib.pyplot as plt
 import pyfits
-import eq2gal
-
-def IndexToDeclRa(NSIDE,index):
-    
-    theta,phi=hp.pixelfunc.pix2ang(NSIDE,index)
-    return np.degrees(mt.pi/2.0-theta),np.degrees(phi)
-
-def DeclRaToIndex(decl,RA,NSIDE):
-    return hp.pixelfunc.ang2pix(NSIDE,np.radians(90.-decl),np.radians(RA))
+import sys
 
 
-nside=64
-mask=np.zeros(hp.nside2npix(nside))
-i=np.arange(hp.nside2npix(nside))
+mask=hp.read_map(sys.argv[1],0)
 
-#Create mask
-if True:
-    # use RA,Dec coords and mask galaxy
-    decl,ra=IndexToDeclRa(nside,i)
-    eqfunk=np.vectorize(eq2gal.eq2gal)
-    ll,bb=eqfunk(np.radians(ra),np.radians(decl))
-    ll=np.degrees(ll)
-    bb=np.degrees(bb)
-    mask=(abs(bb)+(180-abs(ll-180))/12-10)
-#    mask=(abs(bb)-20)
-else:
-    # use l,b and mask galaxy
-    bb, ll=IndexToDeclRa(nside,i)
-    mask=(abs(bb)+(180-abs(ll-180))/12-10)
-    
-#mask=np.where(mask>0,np.exp(-0.1/(mask*mask)),0)
-mask=np.where(mask>0,1,0)
-hp.write_map("mask.fits.gz", mask)
+randmap=hp.read_map(sys.argv[2],0)
+nside=hp.get_nside(randmap)
 
+mask=hp.pixelfunc.ud_grade(mask,nside_out = nside, order_in = 'RING', order_out = 'RING')
 
-#Create random map
-if False:
-    lmax2=16
-    mmax2=lmax2
-    almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
-    realrandalm=np.random.uniform(size=almsize2)
-    imagrandalm=np.random.uniform(size=almsize2)
-    randmap=hp.sphtfunc.alm2map(realrandalm+1j*imagrandalm,nside)
-    maskedrandmap=mask*(randmap+np.random.normal(scale=2,size=len(randmap)))
-else:
-#load galaxy map
-    randmap=hp.read_map("2MPZ.gz_0.03_0.04_smoothed.fits",0)
-    randmap=hp.pixelfunc.ud_grade(randmap,nside_out = nside, order_in = 'RING', order_out = 'RING')
-    meanrandmap=np.mean(randmap)
-#    mask[randmap<1e-2*meanrandmap]=0
-    maskedrandmap=mask*randmap
-
-hp.mollview(mask,coord='C',rot = [0,0.3],
-            title='Mask', unit='prob', xsize=1024)
-hp.graticule()
-plt.savefig("Mask.png")
-# plt.show()
-plt.close()
-
-hp.mollview(randmap,coord='C',rot = [0,0.3],
-            title='RandMap', unit='prob', xsize=1024, norm='hist')
-hp.graticule()
-plt.savefig("RandMap.png")
-# plt.show()
-plt.close()
-
-
-hp.mollview(maskedrandmap,coord='C',rot = [0,0.3],
-            title='MaskedRandMap', unit='prob', xsize=1024, norm='hist')
-hp.graticule()
-plt.savefig("MaskedRandMap.png")
-# plt.show()
-plt.close()
-
-
+maskedrandmap=mask*randmap
 
 #
 # NB: there are more feautures than in the original map
@@ -206,7 +142,7 @@ for thresh in np.logspace(-3.5,-0.5,200):
         yt=hp.sphtfunc.alm2map(alphat,nside)
     
     i=i+1
-    if (i % 5 == 0):
+    if (i % 5 == 0 and False):
         hp.mollview(yt,coord='C',rot = [0,0.3],
                     title='Reconstruction %d' % i, unit='prob', xsize=1024, norm='hist')
         hp.graticule()
@@ -214,11 +150,10 @@ for thresh in np.logspace(-3.5,-0.5,200):
         plt.close()
 
 diffmap=yt-randmap
-hp.mollview(diffmap,coord='C',rot = [0,0.3],
-            title='DiffMap', unit='prob', xsize=1024)
-hp.graticule()
-plt.savefig("DiffMap.png")
-plt.close()
+
+hp.write_map(sys.argv[3], diffmap)
+hp.write_map(sys.argv[4], yt)
+
 
 
 
