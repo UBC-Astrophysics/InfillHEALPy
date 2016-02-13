@@ -40,120 +40,173 @@ import pyfits
 import sys
 
 
-mask=hp.read_map(sys.argv[1],0)
+def _parse_command_line_arguments():
+    """
+    Parse and return command line arguments
+    """
+    parser = ArgumentParser(
+        description=(
+            'Command-line tool to Infill a galaxy map within a masked region'
+        ),
+    )
+    parser.add_argument(
+        'sky-map',
+        type=str,
+        help=(
+            'A FITS file containing the Galaxy map in HEALPIX format'
+        ),
+    )
+    parser.add_argument(
+        'mask-map',
+        type=str,
+        help=(
+            'A FITS file containing the mask map in HEALPIX format'
+        ),
+    )
+    parser.add_argument(
+        'infilled-map',
+        type=str,
+        help=(
+            'A FITS file for the output infilled map'
+        ),
+    )
+    parser.add_argument(
+        'difference-map',
+        type=str,
+        help=(
+            'A FITS file for the output difference between infilled map and the input map'
+        ),
+    )
+    arguments = vars(parser.parse_args())
+    return arguments
 
-randmap=hp.read_map(sys.argv[2],0)
-nside=hp.get_nside(randmap)
+def Infill(galmapfile,maskfile,inffile,difffile,lmax2=64,mmax2=64):
+    randmap=hp.read_map(galmapfile,0)
+    mask=hp.read_map(maskfile,0)
 
-mask=hp.pixelfunc.ud_grade(mask,nside_out = nside, order_in = 'RING', order_out = 'RING')
+    nside=hp.get_nside(randmap)
 
-maskedrandmap=mask*randmap
+    mask=hp.pixelfunc.ud_grade(mask,nside_out = nside, order_in = 'RING', order_out = 'RING')
 
-#
-# NB: there are more feautures than in the original map
-#
-lmax2=64
-mmax2=64
-almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
+    maskedrandmap=mask*randmap
 
-#
-# we will threshold and use the strongest features first 
-#
-# Jerome Bobin, Jean-Luc Starck, Jalal M. Fadili,
-# Yassir Moudden, and David L. Donoho (2007)
-# Morphological Component Analysis: An Adaptive Thresholding Strategy
-# IEEE TRANSACTIONS ON IMAGE PROCESSING, VOL. 16, NO. 11, 2675
-#
-# P. Abriala, Y. Mouddena, J.-L. Starck, J. Fadili, J. Delabrouille
-# M.K. Nguyen (2008)
-# CMB data analysis and sparsity
-# Statistical Methodology 5 289-298
-#
-# Thresholding scheme (Step 1 in Bobin)
-#
-# 1) Fit using all features
-# 2) Sort from strongest to weakest
-# 3) Keep only the strongest portion with a fraction=thresh
-# 4) thresh increases logarithmically and reaches unity where it
-#    iterates further
-
-# set zeroth iteration
-i=0
-
-# set initial guess to mean of map (outside of masked region)
-yt=0*maskedrandmap+np.sum(maskedrandmap)/np.sum(mask)
-
-for thresh in np.logspace(-3.5,-0.5,200):
     #
-    # calculate residual (Step 2a in Bobin et al)
+    # NB: there are more feautures than in the original map
     #
-    # we will use just the residual in the unmasked region
-    #
+    almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
 
     #
-    # repeat five times with the same number of coefficients to burn in
+    # we will threshold and use the strongest features first 
     #
-    for j in range(1):
-        rt=maskedrandmap-yt
+    # Jerome Bobin, Jean-Luc Starck, Jalal M. Fadili,
+    # Yassir Moudden, and David L. Donoho (2007)
+    # Morphological Component Analysis: An Adaptive Thresholding Strategy
+    # IEEE TRANSACTIONS ON IMAGE PROCESSING, VOL. 16, NO. 11, 2675
+    #
+    # P. Abriala, Y. Mouddena, J.-L. Starck, J. Fadili, J. Delabrouille
+    # M.K. Nguyen (2008)
+    # CMB data analysis and sparsity
+    # Statistical Methodology 5 289-298
+    #
+    # Thresholding scheme (Step 1 in Bobin)
+    #
+    # 1) Fit using all features
+    # 2) Sort from strongest to weakest
+    # 3) Keep only the strongest portion with a fraction=thresh
+    # 4) thresh increases logarithmically and reaches unity where it
+    #    iterates further
     
+    # set zeroth iteration
+    i=0
+
+    # set initial guess to mean of map (outside of masked region)
+    yt=0*maskedrandmap+np.sum(maskedrandmap)/np.sum(mask)
+
+    for thresh in np.logspace(-3.5,-0.5,200):
         #
-        # calculate coefficients (Step 2b started in Bobin et al)
+        # calculate residual (Step 2a in Bobin et al)
         #
-        if False:
-            alphat=hp.sphtfunc.map2alm(mask*rt+yt,lmax=lmax2,mmax=mmax2)
-        else:
-            alphat=hp.sphtfunc.map2alm(mask*rt+yt)
-            almsize2=len(alphat)
-        
-        absalphat=np.abs(alphat)
-        maxabsalphat=max(absalphat)
-        print ('iteration %d %d %g %g %g %d' % (i,j,maxabsalphat,np.sum(absalphat),thresh,int(thresh*almsize2)))
-    
-        #
-        # sort the coefficients from largest to smallest
-        #
-    
-        sortedindex=np.argsort(-absalphat)
-    
-        #
-        # find in the indices of the biggest ones
+        # we will use just the residual in the unmasked region
         #
 
-        bigvalues=sortedindex[0:int(almsize2*thresh)]
-        alphatnew=0*alphat
+        #
+        # repeat five times with the same number of coefficients to burn in
+        #
+        for j in range(1):
+            rt=maskedrandmap-yt
     
-        #
-        # load the biggest ones into an array with others zeroed out
-        #
+            #
+            # calculate coefficients (Step 2b started in Bobin et al)
+            #
+            if False:
+                alphat=hp.sphtfunc.map2alm(mask*rt+yt,lmax=lmax2,mmax=mmax2)
+            else:
+                alphat=hp.sphtfunc.map2alm(mask*rt+yt)
+                almsize2=len(alphat)
+                
+            absalphat=np.abs(alphat)
+            maxabsalphat=max(absalphat)
+            print ('iteration %d %d %g %g %g %d' % (i,j,maxabsalphat,np.sum(absalphat),thresh,int(thresh*almsize2)))
+            
+            #
+            # sort the coefficients from largest to smallest
+            #
+            
+            sortedindex=np.argsort(-absalphat)
+                
+            #
+            # find in the indices of the biggest ones
+            #
+            
+            bigvalues=sortedindex[0:int(almsize2*thresh)]
+            alphatnew=0*alphat
+            
+            #
+            # load the biggest ones into an array with others zeroed out
+            #
+            
+            alphatnew[bigvalues]=alphat[bigvalues]
     
-        alphatnew[bigvalues]=alphat[bigvalues]
+            #
+            # apply the thresholds (Step 2b finished)
+            #
+
+            alphat=alphatnew
     
-        #
-        # apply the thresholds (Step 2b finished)
-        #
+            #
+            # alphat=np.where(absalphat>thresh,alphat,0)
+            # calculate the next guess
+            #
 
-        alphat=alphatnew
+            yt=hp.sphtfunc.alm2map(alphat,nside)
     
-        #
-        # alphat=np.where(absalphat>thresh,alphat,0)
-        # calculate the next guess
-        #
+        i=i+1
 
-        yt=hp.sphtfunc.alm2map(alphat,nside)
+    diffmap=yt-randmap
+
+    hp.write_map(inffile, yt)
+
+    if (difffile!=None):
+        hp.write_map(diffile, diffmap)
+
+#------------------------------------------------------------------------------
+# main
+#
+def _main():
+    """
+    This is the main routine.
+    """
+
+    args=_parse_command_line_arguments()
     
-    i=i+1
-    if (i % 5 == 0 and False):
-        hp.mollview(yt,coord='C',rot = [0,0.3],
-                    title='Reconstruction %d' % i, unit='prob', xsize=1024, norm='hist')
-        hp.graticule()
-        plt.savefig("recon_%03d.png" % i)
-        plt.close()
+    Infill(args['sky-map'],args['mask-map'],args['infilled-map'],
+           args['difference-map'])
 
-diffmap=yt-randmap
-
-hp.write_map(sys.argv[3], diffmap)
-hp.write_map(sys.argv[4], yt)
-
+#------------------------------------------------------------------------------
+# Start program execution.
+#
+if __name__ == '__main__':
+    _main()
 
 
 
