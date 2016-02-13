@@ -6,11 +6,10 @@
 # Jeremy Heyl
 # UBC Southern Observatory
 #
-# This script creates a simple mask and uses the assumption of sparseness
-# in spherical harmonics to infill the mask
+# This script loads a simple mask and image, and uses the
+# assumption of sparseness in spherical harmonics to infill the mask
 #
-# usage: python Infill.py
-#
+# usage: Infill.py [-h] sky-map mask-map infilled-map difference-map
 #
 # Questions: heyl@phas.ubc.ca
 #
