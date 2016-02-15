@@ -186,7 +186,7 @@ def Infill(galmapfile,maskfile,inffile,difffile,lmax2=64,mmax2=64):
     hp.write_map(inffile, yt)
 
     if (difffile!=None):
-        hp.write_map(diffile, diffmap)
+        hp.write_map(difffile, diffmap)
 
 #------------------------------------------------------------------------------
 # main
