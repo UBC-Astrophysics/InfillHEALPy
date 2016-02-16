@@ -40,7 +40,7 @@ if (len(sys.argv)<2):
     
 for rr in sys.argv[1:]:
     map=hp.read_map(rr,0)
-    hp.mollview(map,coord=['C','G'],rot = [0,0.3],title='',min=0,max=0.65)
+    hp.mollview(map,coord=['C','G'],title='',min=0,max=0.65)
     hp.graticule()
     plt.show()
     plt.close()
