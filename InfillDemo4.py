@@ -35,6 +35,8 @@ from argparse import ArgumentParser
 import math as mt
 import numpy as np
 import healpy as hp
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pyfits
 import eq2gal
@@ -79,15 +81,36 @@ if False:
     almsize2=mmax2*(2*lmax2+1-mmax2)/2+lmax2+1
     realrandalm=np.random.uniform(size=almsize2)
     imagrandalm=np.random.uniform(size=almsize2)
-    randmap=hp.sphtfunc.alm2map(realrandalm+1j*imagrandalm,nside)
-    maskedrandmap=mask*(randmap+np.random.normal(scale=2,size=len(randmap)))
-else:
+    i=np.arange(len(realrandalm))
+    weight=1
+    randmap=hp.sphtfunc.alm2map(weight*(realrandalm+1j*imagrandalm),nside)
+    hp.write_map("rand_map.fits.gz",randmap)
+    maskedrandmap=mask*(randmap+np.random.normal(scale=0.2,size=len(randmap)))
+    hp.write_map("maskedrand_map.fits.gz",maskedrandmap)
+# LOAD RANDOM MAP
+if False:
+    randmap=hp.read_map("recon_fake/rand_map.fits.gz",0)
+    maskedrandmap=hp.read_map("recon_fake/maskedrand_map.fits.gz",0)
+# LOAD RANDOM MAP MASK and NOISE
+if False:
+    randmap=hp.read_map("../recon_semifake/rand_map.fits.gz",0)
+    hp.write_map("rand_map.fits.gz",randmap)
+    maskedrandmap=mask*(randmap+np.random.normal(scale=0.02,size=len(randmap)))
+    hp.write_map("maskedrand_map.fits.gz",maskedrandmap)
+if True:
 #load galaxy map
-    randmap=hp.read_map("2MPZ.gz_0.03_0.04_smoothed.fits",0)
+    randmap=hp.read_map("../2MPZ.gz_0.01_0.1_smoothed.fits.gz",0)
     randmap=hp.pixelfunc.ud_grade(randmap,nside_out = nside, order_in = 'RING', order_out = 'RING')
     meanrandmap=np.mean(randmap)
 #    mask[randmap<1e-2*meanrandmap]=0
     maskedrandmap=mask*randmap
+# GENERATE RANDOM MAP WITH THE SAME CLS AS LOADED
+if True:
+    cl = hp.anafast(randmap)
+    randmap=hp.synfast(cl,nside)
+    maskedrandmap=mask*randmap
+    hp.write_map("rand_map.fits.gz",randmap)
+    hp.write_map("maskedrand_map.fits.gz",maskedrandmap)
 
 hp.mollview(mask,coord='C',rot = [0,0.3],
             title='Mask', unit='prob', xsize=1024)
@@ -97,7 +120,7 @@ plt.savefig("Mask.png")
 plt.close()
 
 hp.mollview(randmap,coord='C',rot = [0,0.3],
-            title='RandMap', unit='prob', xsize=1024, norm='hist')
+            title='Random Map', unit='prob', xsize=1024, norm='hist')
 hp.graticule()
 plt.savefig("RandMap.png")
 # plt.show()
@@ -105,7 +128,7 @@ plt.close()
 
 
 hp.mollview(maskedrandmap,coord='C',rot = [0,0.3],
-            title='MaskedRandMap', unit='prob', xsize=1024, norm='hist')
+            title='Masked Random Map', unit='prob', xsize=1024, norm='hist')
 hp.graticule()
 plt.savefig("MaskedRandMap.png")
 # plt.show()
@@ -206,12 +229,15 @@ for thresh in np.logspace(-3.5,-0.5,200):
         yt=hp.sphtfunc.alm2map(alphat,nside)
     
     i=i+1
-    if (i % 5 == 0):
+#    if (i % 5 == 0):
+    if False:
         hp.mollview(yt,coord='C',rot = [0,0.3],
                     title='Reconstruction %d' % i, unit='prob', xsize=1024, norm='hist')
         hp.graticule()
         plt.savefig("recon_%03d.png" % i)
         plt.close()
+
+hp.write_map("final_map.fits.gz",yt)
 
 diffmap=yt-randmap
 hp.mollview(diffmap,coord='C',rot = [0,0.3],
