@@ -92,20 +92,32 @@ if False:
     randmap=hp.read_map("recon_fake/rand_map.fits.gz",0)
     maskedrandmap=hp.read_map("recon_fake/maskedrand_map.fits.gz",0)
 # LOAD RANDOM MAP MASK and NOISE
+<<<<<<< HEAD
 if False:
+=======
+if True:
+>>>>>>> 051706a2d9152003a88d0454cb8dc271be50e22e
     randmap=hp.read_map("../recon_semifake/rand_map.fits.gz",0)
     hp.write_map("rand_map.fits.gz",randmap)
     maskedrandmap=mask*(randmap+np.random.normal(scale=0.02,size=len(randmap)))
     hp.write_map("maskedrand_map.fits.gz",maskedrandmap)
 if True:
 #load galaxy map
+<<<<<<< HEAD
     randmap=hp.read_map("../2MPZ.gz_0.01_0.1_smoothed.fits.gz",0)
+=======
+    randmap=hp.read_map("2MPZ.gz_0.01_0.1_smoothed.fits.gz",0)
+>>>>>>> 051706a2d9152003a88d0454cb8dc271be50e22e
     randmap=hp.pixelfunc.ud_grade(randmap,nside_out = nside, order_in = 'RING', order_out = 'RING')
     meanrandmap=np.mean(randmap)
 #    mask[randmap<1e-2*meanrandmap]=0
     maskedrandmap=mask*randmap
 # GENERATE RANDOM MAP WITH THE SAME CLS AS LOADED
+<<<<<<< HEAD
 if True:
+=======
+if False:
+>>>>>>> 051706a2d9152003a88d0454cb8dc271be50e22e
     cl = hp.anafast(randmap)
     randmap=hp.synfast(cl,nside)
     maskedrandmap=mask*randmap
