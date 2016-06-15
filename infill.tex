@@ -37,7 +37,7 @@
 \end{abstract}
 
 \section{The Tecnhique}
-
+\label{sec:tecnhique}
 The technique is straightforward to describe and to implement, and we
 will outline it below.  Let the map be given by $a(\Omega)$ and the
 mask by $m(\Omega)$ where $m(\Omega)=1$ where the underlying galaxies
@@ -94,6 +94,11 @@ edge of the mask do influence the guess within the masked region.
 fake test gives R=0.70
 
 \section{Tests}
+\label{sec:tests}
+
+
+\subsection{Simulated Maps}
+\label{sec:simulated-maps}
 
 To understand the effectiveness of these techniques we simulate galaxy
 sky maps with the Galactic plane hidden and cross-correlate the
@@ -104,9 +109,41 @@ These simulated maps by design have the same angular power spectrum as
 the real 2MASS data including the zone of avoidance but different
 phases, so they don't exhibit a zone of avoidance and they lack the
 potential higher order correlations that the data may exhibit.
+Fig.~\ref{fig:galmap} depicts a particular example of this technique.
+We used the angular power spectrum of the upper panel to create one
+hundred independent maps with the same power spectrum; one of these is
+depicted in the middle panel of the figure.  We masked the Galactic
+plane and used the infilling techinique to fill in the region.  The
+lower panel depicts the difference between in the infilled map and the
+original.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{cleantest_000/orig_map}
+  \includegraphics[width=\columnwidth]{cleantest_000/RandMap}
+  \includegraphics[width=\columnwidth]{cleantest_000/DiffMap}
+  \caption{Upper: the relative surface density of galaxies in the
+    2-MASS Photometric Redshift Survey with photometric redshifts
+    between 0.01 and 0.1, smoothed with a Gaussian of 0.6 degrees
+    (0.01 radian), the input map.  Middle: the test map constructed
+    using the angular power spectrum of the map in the upper panel.
+    Lower: we masked the Galactic plane of the middle panel and
+    reconstructed the image using the techinque in
+    \S~\ref{sec:tecnhique}.  The difference between the middle panel
+    and the reconstructed map is depicted.}
+  \label{fig:testmap}
+\end{figure}
 
+To make statistic sense of the agreement we calculate Pearson's
+correlation coefficient ($r$) between the original data and the
+infilled reproduction within the infilled region for each of the
+trials and examine its cumulative distribution as depicted in
+Fig.~
 
-\subsection{Simulated Maps}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{cleantest}
+  \caption{Cumulative distribution of $r$ for 100 trials of the
+    infilling procedure with simulated data}
+\end{figure}
+
 
 \subsection{Observed Maps}
 
