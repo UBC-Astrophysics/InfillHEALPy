@@ -1,9 +1,9 @@
 awk '($1>10 || $1<-10)' ang_res.dat | sort -g -k 2 | awk '{print $2, NR/3399.,NR,$0}' > ang_data_sorted.dat
-ctioga2 --name ang_combo --setup-grid 1x2 --inset grid:0,1 \
+ctioga2 --name ang_combo --setup-grid 1x2 --inset grid:0,0 \
         ang_res.dat	\
        --xlabel 'Angular Shift [degrees]' \
        --ylabel '$r_m$' \
-        --next-inset grid:0,0 \
+        --next-inset grid:0,1 \
         ang_data_sorted.dat \
         --xlabel 'Pearson Correlation Coefficient $r$' \
         --ylabel '$C(r_m < r)$' \
