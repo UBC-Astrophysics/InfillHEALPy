@@ -225,22 +225,34 @@ expect by chance.
 \section{Results}
 
 After demonstrating the efficacy of the infilling procedure, we now
-perform the calculation to infill only through the Galactic plane (we did
-infill the Galactic plane in the tests as well).  The upper panel of
-Fig~\ref{fig:infilling} depicts the mask that we will use to mask the
-data in Fig.~\ref{fig:galmap}, and the middle panel gives the initial
-galaxy map with the masked region filled in.  There are several
-structures within masked region that connect with the structures on either
-side of the Galactic plane.  Finally, we can estimate the
-signal-to-noise of the infilled map by calculate a series of galaxy
-density maps by resampling the 2MPZ to obtain new catalogues, new maps
-and new infilled maps.  The lower panel of Fig.~\ref{fig:infilling}
-depicts the signal-to-noise ratio of the map.  Outside of the Galactic
-plane the signal-to-noise almost everywhere exceeds four.  In the
-infilled region most of the overdense structures correspond to high
-signal-to-noise regions and therefore may provide a reliable estimate
-of the regions in the zone of avoidance where $P(\mathrm{Position})$
-is large.
+perform the calculation to infill only through the Galactic plane (we
+did infill the Galactic plane in the tests as well).  The upper panel
+of Fig~\ref{fig:infilling} depicts the mask that we will use to mask
+the data in upper panel of Fig.~\ref{fig:testmap}, and the middle
+panel gives the initial galaxy map with the masked region filled in.
+There are several structures within masked region that connect with
+the structures on either side of the Galactic plane.  Finally, we can
+estimate the signal-to-noise of the infilled map by calculate a series
+of galaxy density maps by resampling the 2MPZ to obtain new
+catalogues, new maps and new infilled maps.  The lower panel of
+Fig.~\ref{fig:infilling} depicts the signal-to-noise ratio of the map.
+Outside of the Galactic plane the signal-to-noise almost everywhere
+exceeds four.  In the infilled region most of the overdense structures
+correspond to high signal-to-noise regions and therefore may provide a
+reliable estimate of the regions in the zone of avoidance where
+$P(\mathrm{Position})$ is large.
+\begin{figure}
+  \includegraphics[width=\columnwidth,clip,trim=0 1in 0 0]{prod_mask}
+  \includegraphics[width=\columnwidth]{infilled_prod_mask}
+  \includegraphics[width=\columnwidth]{sigma_prod_mask}
+  \caption{Upper: the mask used for the infilling procedure obtained
+    by determining the regions where the galaxy density is less than
+    one tenth of the mean or the star density lies above a given
+    threshold (see text for details).  Middle: the infilled galaxy
+    distribution. Lower: The standard deviation of the infilled map
+    obtained by bootstrapping the galaxy catalogue.}
+  \label{fig:infilling}
+\end{figure}
 
 
 \section{Discussion}
