@@ -1,7 +1,19 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{3}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Antolini \& Heyl(2016)}]{2016arXiv160207710A}
 Antolini, E. \& Heyl, J.~S. 2016, \mn, submitted (7 pages)
+
+\bibitem[{{Makarov} {et~al.}(2014){Makarov}, {Prugniel}, {Terekhova},
+  {Courtois}, \& {Vauglin}}]{2014A&A...570A..13M}
+{Makarov}, D., {Prugniel}, P., {Terekhova}, N., {Courtois}, H., \& {Vauglin},
+  I. 2014, \aap, 570, A13
+
+\bibitem[{{Staveley-Smith} {et~al.}(2016){Staveley-Smith}, {Kraan-Korteweg},
+  {Schr{\"o}der}, {Henning}, {Koribalski}, {Stewart}, \&
+  {Heald}}]{2016AJ....151...52S}
+{Staveley-Smith}, L., {Kraan-Korteweg}, R.~C., {Schr{\"o}der}, A.~C.,
+  {Henning}, P.~A., {Koribalski}, B.~S., {Stewart}, I.~M., \& {Heald}, G. 2016,
+  \aj, 151, 52
 
 \end{thebibliography}
