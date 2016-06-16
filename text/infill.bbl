@@ -1,0 +1,7 @@
+\begin{thebibliography}{1}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Antolini \& Heyl(2016)}]{2016arXiv160207710A}
+Antolini, E. \& Heyl, J.~S. 2016, \mn, submitted (7 pages)
+
+\end{thebibliography}
