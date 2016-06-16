@@ -196,13 +196,20 @@ the test region reaches nearly four-sigma significance.
   \label{fig:infilling_test}
 \end{figure}
 
-The second test exploited the fact that the masked that we used was
+The second test exploited the fact that the mask that we used was a
 strip in equatorial coordinates, so if we shift the reconstructed
 galaxy map relative to the input map in right ascension, we do not
 expect the two maps to be correlated.  This shift test is depicted in
 the upper panel of Fig.~\ref{fig:shift_test}.  For zero degrees, the
 maximum correlation of $0.25$ is achieved but for shifts greater than
-a few degrees the correlation appears to be centered about zero.
+a few degrees the correlation appears to be centered about zero.  The
+lower panel gives the cumulative distribution of correlation
+coefficients.  The mean is just slightly less than zero and the
+standard deviation is $0.04$, slightly less than for the first test.
+Again we see than the observed correlation for the unshifted data of
+$0.25$ is statistically significant.  The reconstruction contains much
+more information about the hidden galaxy distribution that one would
+expect by chance.
 \begin{figure}
   \includegraphics[width=\columnwidth]{ang_combo}
   \caption{Upper panel: Pearson's correlation coefficient as a
