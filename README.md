@@ -8,3 +8,7 @@ Jerome Bobin, Jean-Luc Starck, Jalal M. Fadili, Yassir Moudden, and David L. Don
 P. Abriala, Y. Mouddena, J.-L. Starck, J. Fadili, J. Delabrouille, M.K. Nguyen (2008), CMB data analysis and sparsity, Statistical Methodology 5 289-298
 
 and assumption of sparseness in spherical harmonics to infill the mask.
+
+Use Infill.py to perform infilling, PlotMap.py to view the maps and StatMap.py to calculate mean and dispersion of a series of maps.
+
+The various InfillDemo?.py programs were used to perform the tests in the paper.
