@@ -6,8 +6,8 @@
 # Jeremy Heyl
 # UBC Southern Observatory
 #
-# This script creates a simple mask and uses the assumption of sparseness
-# in spherical harmonics to infill the mask
+# This script plots a bunch of HEALPIX fits file
+#
 #
 # usage: python PlotMap.py List_HEALPIX_FITS_Files
 #
@@ -40,7 +40,7 @@ if (len(sys.argv)<2):
     
 for rr in sys.argv[1:]:
     map=hp.read_map(rr,0)
-    hp.mollview(map,coord=['C','G'],title='',min=0,max=0.65)
+    hp.mollview(map,coord=['C','G'],title='')
     hp.graticule()
     plt.show()
     plt.close()
