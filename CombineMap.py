@@ -8,7 +8,7 @@
 #
 # This script loads a simple mask, image and infilled image, and rescales the
 # infilled region so that the mean and dispersion of the infilled region equals
-# that of the rest of the map.
+# that of the rest of the map and combines the two maps.
 #
 # usage: CombineMap.py [-h] sky-map mask-map infilled-map combined-map
 #
