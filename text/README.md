@@ -15,3 +15,4 @@ The area of the HZOA survey is -5 < b < 5 and -148 < l < 36.
 * What is the median number of fields?
 * Can we estimate this statistically if each of 365 galaxies is it own field?
 * How many random fields to get half of the galaxies?
+* What is the standard deviation?
