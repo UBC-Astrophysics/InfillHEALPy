@@ -14,5 +14,5 @@ The area of the HZOA survey is -5 < b < 5 and -148 < l < 36.
 * Calculate cumulative number of galaxies with number of fields 
 * What is the median number of fields?
 * Can we estimate this statistically if each of 365 galaxies is it own field?
-* How many random fields to get half of the galaxies?
+* How many random fields to get half of the galaxies?  Take each field to be 0.05, 0.2 and 0.8 square degrees (for example)
 * What is the standard deviation?
