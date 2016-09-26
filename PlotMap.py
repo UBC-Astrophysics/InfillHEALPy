@@ -32,7 +32,7 @@
 import healpy as hp
 import sys
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 
 if (len(sys.argv)<2):
     print("usage: python PlotMap.py List_HEALPIX_FITS_Files")
@@ -40,6 +40,7 @@ if (len(sys.argv)<2):
     
 for rr in sys.argv[1:]:
     map=hp.read_map(rr,0)
+#    hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
     hp.mollview(map,coord=['C','G'],title='')
     hp.graticule()
     plt.show()

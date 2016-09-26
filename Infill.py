@@ -183,10 +183,10 @@ def Infill(galmapfile,maskfile,inffile,difffile,lmax2=64,mmax2=64):
 
     diffmap=yt-randmap
 
-    hp.write_map(inffile, yt)
+    hp.write_map(inffile, yt,coord='C')
 
     if (difffile!=None):
-        hp.write_map(difffile, diffmap)
+        hp.write_map(difffile, diffmap,coord='C')
 
 #------------------------------------------------------------------------------
 # main

@@ -12,3 +12,4 @@ and assumption of sparseness in spherical harmonics to infill the mask.
 Use Infill.py to perform infilling, PlotMap.py to view the maps and StatMap.py to calculate mean and dispersion of a series of maps.
 
 The various InfillDemo?.py programs were used to perform the tests in the paper.
+
