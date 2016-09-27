@@ -105,7 +105,7 @@ def IndexToDeclRa(NSIDE,index):
     theta,phi=hp.pixelfunc.pix2ang(NSIDE,index)
     return np.degrees(mt.pi/2.0-theta),np.degrees(phi)
 
-rah,ram,ras,ded,dem,des,l, b, v = np.loadtxt("hzoa.txt",usecols=[1,2,3,4,5,6,7,8,10],unpack=True,skiprows=65)
+rah,ram,ras,ded,dem,des,l, b, v = np.loadtxt("hzoa.txt",usecols=[1,2,3,4,5,6,7,8,10],unpack=True,skiprows=198)
 ra2=(rah+(ram+ras/60)/60)*15
 dec2=np.where(ded<0,ded-(dem+des/60)/60,ded+(dem+des/60)/60)
 ra,dec=ga2equ(l,b)
@@ -129,7 +129,7 @@ print('sum over the map %d' %np.sum(maphzoa))
 
 dd,rr=IndexToDeclRa(256,range(len(map)))
 ll,bb=eq2gal(rr,dd)
-surveyarea=np.where(np.logical_and(np.logical_or(ll<36,ll>212),np.abs(bb)<6),1,0)
+surveyarea=np.where(np.logical_and(np.logical_or(ll<36,ll>300),np.abs(bb)<6),1,0)
 mapsurvey=map[surveyarea>0]
 maphzoacut=maphzoa[surveyarea>0]
 sortl=np.argsort(-mapsurvey)
@@ -165,7 +165,7 @@ if True:
     w=[]
 
     for i in range(10000):
-        longr=np.random.uniform(low=212-360,high=36,size=nn)
+        longr=np.random.uniform(low=-60,high=36,size=nn)
         latr=np.random.uniform(low=-5,high=5,size=nn)
         rar,decr=ga2equ(longr,latr)
         ii_rand=DeclRaToIndex(decr,rar,256)
@@ -186,9 +186,9 @@ ii_leda=DeclRaToIndex(dec2,ra2,256)
 print('mean on LEDA %g' %
       np.mean((map*(1-mask))[ii_leda]))
 
-hp.mollview(maphzoa,coord=['C','G'],title='')
+#hp.mollview(maphzoa,coord=['C','G'],title='')
 print('total maphzoa=%g' % np.sum(maphzoa))
-# hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
+hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
 hp.graticule()
 # keep=np.logical_and(v>4500,v<5500)
 # x=x[keep]
