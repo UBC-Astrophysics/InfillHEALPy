@@ -116,6 +116,7 @@ np.savetxt('testconv2.dat',np.transpose([l,ll2,b,bb2]))
 x,y =xy_funk(l,b)
 
 map=hp.read_map("2MPZ.gz_0.01_0.02_smoothed_inf.fits.gz",0)
+map=np.where(map<0,0,map)
 print(len(l))
 
 ii_hzoa=DeclRaToIndex(dec,ra,hp.get_nside(map))
@@ -132,10 +133,9 @@ surveyarea=np.where(np.logical_and(np.logical_or(ll<36,ll>212),np.abs(bb)<6),1,0
 mapsurvey=map[surveyarea>0]
 maphzoacut=maphzoa[surveyarea>0]
 sortl=np.argsort(-mapsurvey)
-maplist=maphzoacut[sortl]
-galsum=np.cumsum(maplist)
-for ig in enumerate(galsum):
-    print('%d %g' % ig)
+galsum=np.cumsum(maphzoacut[sortl])
+mapsum=np.cumsum(mapsurvey[sortl])
+np.savetxt('hzoa_cum.dat',np.transpose([np.arange(len(galsum)),galsum,mapsum]))
 
 hp.mollview(maphzoa,coord=['C','G'],title='')
 # hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
@@ -152,7 +152,7 @@ mapf=map*(1-mask)
 print('mean on HZOA %g ; mean in mask %g ; mean of maphzoa %g' %
       (np.mean(mapf[ii_hzoa]),np.mean(mapf),np.sum(mapf*maphzoa)/np.sum(maphzoa)))
 
-if False:    
+if True:    
     sig=hp.read_map("text/sigmamap.fits.gz",0)
     wmapf=mapf/sig**2
     wf=(1-mask)/sig**2
