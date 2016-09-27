@@ -110,23 +110,28 @@ ra2=(rah+(ram+ras/60)/60)*15
 dec2=np.where(ded<0,ded-(dem+des/60)/60,ded+(dem+des/60)/60)
 ra,dec=ga2equ(l,b)
 np.savetxt('testconv.dat',np.transpose([ra,ra2,dec,dec2]))
-ll2,bb2=eq2gal(ra2,dec2)
+ll2,bb2=eq2gal(ra,dec)
+np.savetxt('testconv2.dat',np.transpose([l,ll2,b,bb2]))
 
-ii_hzoa=DeclRaToIndex(dec,ra,256)
-print(len(ii_hzoa))
 x,y =xy_funk(l,b)
 
 map=hp.read_map("2MPZ.gz_0.01_0.02_smoothed_inf.fits.gz",0)
 print(len(l))
 
+ii_hzoa=DeclRaToIndex(dec,ra,hp.get_nside(map))
+print('number of ii_hzoa entries %d' % len(ii_hzoa))
 maphzoa=0*map
-maphzoa[ii_hzoa]=maphzoa[ii_hzoa]+1
+for i in ii_hzoa:
+    maphzoa[i]=maphzoa[i]+1
+    
+print('sum over the map %d' %np.sum(maphzoa))
+
 dd,rr=IndexToDeclRa(256,range(len(map)))
 ll,bb=eq2gal(rr,dd)
-surveyarea=np.where(np.logical_and(np.logical_or(ll<36,ll>212),np.abs(bb)<5),1,0)
+surveyarea=np.where(np.logical_and(np.logical_or(ll<36,ll>212),np.abs(bb)<6),1,0)
 mapsurvey=map[surveyarea>0]
 maphzoacut=maphzoa[surveyarea>0]
-sortl=np.argsort(mapsurvey)
+sortl=np.argsort(-mapsurvey)
 maplist=maphzoacut[sortl]
 galsum=np.cumsum(maplist)
 for ig in enumerate(galsum):
@@ -144,8 +149,8 @@ mask=hp.pixelfunc.ud_grade(mask,nside_out = 256, order_in = 'RING', order_out = 
 
 mapf=map*(1-mask)
 
-print('mean on HZOA %g ; mean in mask %g' %
-      (np.mean(mapf[ii_hzoa]),np.mean(mapf)))
+print('mean on HZOA %g ; mean in mask %g ; mean of maphzoa %g' %
+      (np.mean(mapf[ii_hzoa]),np.mean(mapf),np.sum(mapf*maphzoa)/np.sum(maphzoa)))
 
 if False:    
     sig=hp.read_map("text/sigmamap.fits.gz",0)
@@ -188,6 +193,8 @@ hp.graticule()
 # keep=np.logical_and(v>4500,v<5500)
 # x=x[keep]
 # y=y[keep]
+print('dimen of x %d'% len(x))
 plt.scatter(x,y,color='magenta',marker='*')
 # plt.scatter(x2,y2,c='b',s=0.2)
 plt.show()
+
