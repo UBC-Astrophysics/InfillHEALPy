@@ -248,7 +248,9 @@ structures correspond to high signal-to-noise regions.
   \caption{Upper: the mask used for the infilling procedure obtained
     by determining the regions where the galaxy density is less than
     one tenth of the mean or the star density lies above a given
-    threshold (see text for details).  Middle: the infilled galaxy
+    threshold (see text for details).  The box shows the region surveyed by
+    \cite{2016AJ....151...52S}.  The region to the left of the dashed vertical line
+    is our test region.    Middle: the infilled galaxy
     distribution. Lower: The standard deviation of the infilled map
     obtained by bootstrapping the galaxy catalogue.}
   \label{fig:infilling}
@@ -256,35 +258,36 @@ structures correspond to high signal-to-noise regions.
 
 We can compare these results with the discovery of galaxies within the
 zone of avoidance.  We will focus on the recent HI Survey of
-\citet{2016AJ....151...52S} within five degrees of the Galactic plane.
-Fig.~\ref{fig:hzoa_map} plots the 365 galaxies found in the zone of
-avoidance in the redshift range of 0.01 to 0.02 on top of the infilled
-map from Fig.~\ref{fig:infilling}.  The correspondance between the
-overdensities in the infilled map and the observed galaxies is
-striking.  To quantify this we calculate the mean value of the density
-in the map in the locations where HI galaxies lie and find it to be
-$0.0284$.  On the other hand, if we select 365 random locations within
-the survey region we find a mean value of $0.0242$ with a standard
-deviation of $0.0028$.  In fact over a series of 10,000 random trials
-fewer than 3\% yielded mean values as large as those observed from the
-actual galaxies.  The infilled map does significantly better than
-chance in finding galaxies within the zone of avoidance.
+\citet{2016AJ....151...52S} within five degrees of the Galactic plane.  We
+restrict our analysis to those galaxies with $l<36^\circ$ and $l>300^\circ$, that
+lie within the masked region in Fig.~\ref{fig:infilling}.
+Fig.~\ref{fig:hzoa_map} plots the
+232 galaxies found in the zone of avoidance in the redshift range of
+0.01 to 0.02 on top of the infilled map from Fig.~\ref{fig:infilling}.
+The correspondance between the overdensities in the infilled map and
+the observed galaxies is striking.
 \begin{figure}
-  \includegraphics[width=\columnwidth,clip,trim=0 1in 0 0]{hzoa_inf}
+  \includegraphics[width=\columnwidth,clip,trim=0 1in 0 0]{hzoa_inf_cut}
   \caption{Detail from the Galactic Plane in Fig.~\ref{fig:infilling}
-    with the 365 galaxies with redshifts from 0.01 to 0.02 from the survey
+    with the 232 galaxies with redshifts from 0.01 to 0.02 from the survey
     survey of \citet{2016AJ....151...52S}}
   \label{fig:hzoa_map}
 \end{figure}
-
-A second test is to use the infilled galaxy map to generate an
-observing plan and to determine what fraction of the area must be
-surveyed to find a given fraction of the galaxies.
+To quantify this correspondance we use the infilled galaxy map to
+generate an observing plan and to determine what fraction of the area
+must be surveyed to find a given fraction of the galaxies.
 Fig.~\ref{fig:hzoa_cum} shows the fraction of the HZOA survey region
 that would have to be observed to find a given fraction of the HZOA
 galaxies (the red curve) if we use the infilled galaxy map as a guide.
 To recover half of the galaxies in the survey would require observing
-just 42\% of the survey region, a 20\% gain in efficiency.
+just 47\% of the survey region, a 6\% gain in efficiency.  To recover
+80\% of the galaxies requires surveying 72.5\% of the region, a 10\%
+gain.  There are a few important points to keep in mind. We have used
+the approximate photometric redshifts from the 2-MASS Photometric
+Redshift Survey to estimate the density of galaxies in the redshift
+range of 0.01 to 0.02 well outside the HZOA survey region.  Next we
+extend this map into a region with no information using the data
+outside to achieve a 10\% increase in the survey efficiency to find the bulk of the galaxies in the set redshift range.
 
 \begin{figure}
   \includegraphics[width=\columnwidth]{hzoa_cum}
