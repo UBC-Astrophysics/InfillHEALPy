@@ -2,6 +2,46 @@ import healpy as hp
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import math as mt 
+
+# #######################################################################
+# Convert Equatorial coordinates to Galactic coordinates in the epoch J2000
+# #########################################################################
+def eq2gal(ra,dec):
+    """
+    Convert Equatorial coordinates to Galactic Coordinates in the epch J2000.
+    
+    Keywords arguments:
+    ra  -- Right Ascension (in radians)
+    dec -- Declination (in radians)
+
+    Return a tuple (l, b):
+    l -- Galactic longitude (in radians)
+    b -- Galactic latitude (in radians)
+    """
+    ra = np.radians(ra)
+    dec = np.radians(dec)
+    
+    alpha = np.radians(192.859508)
+    delta = np.radians(27.128336)
+    la = np.radians(122.932-90.0)
+
+    b = np.arcsin(np.sin(dec) * np.sin(delta) +
+                  np.cos(dec) * np.cos(delta) * np.cos(ra - alpha))
+
+    l = np.arctan2(np.sin(dec) * np.cos(delta) - 
+                   np.cos(dec) * np.sin(delta) * np.cos(ra - alpha), 
+                   np.cos(dec) * np.sin(ra - alpha)
+                   ) + la
+
+    l=np.where(l>=0,l,(l + mt.pi * 2.0))
+
+    l = l % (2.0 * mt.pi)
+
+    return np.degrees(l), np.degrees(b)
+
+# #The end of eq2gal   ###################################################
+
 
 def ga2equ(l,b):
     """
@@ -60,49 +100,78 @@ def xy_funk(l,b):
 def DeclRaToIndex(decl,RA,NSIDE):
     return hp.pixelfunc.ang2pix(NSIDE,np.radians(90.-decl),np.radians(RA))
 
+def IndexToDeclRa(NSIDE,index):
+    
+    theta,phi=hp.pixelfunc.pix2ang(NSIDE,index)
+    return np.degrees(mt.pi/2.0-theta),np.degrees(phi)
+
 rah,ram,ras,ded,dem,des,l, b, v = np.loadtxt("hzoa.txt",usecols=[1,2,3,4,5,6,7,8,10],unpack=True,skiprows=65)
 ra2=(rah+(ram+ras/60)/60)*15
 dec2=np.where(ded<0,ded-(dem+des/60)/60,ded+(dem+des/60)/60)
 ra,dec=ga2equ(l,b)
 np.savetxt('testconv.dat',np.transpose([ra,ra2,dec,dec2]))
+ll2,bb2=eq2gal(ra2,dec2)
+
 ii_hzoa=DeclRaToIndex(dec,ra,256)
+print(len(ii_hzoa))
 x,y =xy_funk(l,b)
 
 map=hp.read_map("2MPZ.gz_0.01_0.02_smoothed_inf.fits.gz",0)
 print(len(l))
 
+maphzoa=0*map
+maphzoa[ii_hzoa]=maphzoa[ii_hzoa]+1
+dd,rr=IndexToDeclRa(256,range(len(map)))
+ll,bb=eq2gal(rr,dd)
+surveyarea=np.where(np.logical_and(np.logical_or(ll<36,ll>212),np.abs(bb)<5),1,0)
+mapsurvey=map[surveyarea>0]
+maphzoacut=maphzoa[surveyarea>0]
+sortl=np.argsort(mapsurvey)
+maplist=maphzoacut[sortl]
+galsum=np.cumsum(maplist)
+for ig in enumerate(galsum):
+    print('%d %g' % ig)
+
+hp.mollview(maphzoa,coord=['C','G'],title='')
+# hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
+hp.graticule()
+plt.show()
+
+
 mask=hp.read_map("prod_mask.fits.gz",0)
 mask=hp.pixelfunc.ud_grade(mask,nside_out = 256, order_in = 'RING', order_out = 'RING')
+
 
 mapf=map*(1-mask)
 
 print('mean on HZOA %g ; mean in mask %g' %
       (np.mean(mapf[ii_hzoa]),np.mean(mapf)))
+
+if False:    
+    sig=hp.read_map("text/sigmamap.fits.gz",0)
+    wmapf=mapf/sig**2
+    wf=(1-mask)/sig**2
+    print('sigma mean on HZOA %g ; mean in mask %g' %
+          (np.sum(wmapf[ii_hzoa])/np.sum(wf[ii_hzoa]),
+           np.sum(wmapf)/np.sum(wf)))
+
+    nn=len(l)
+    v=[]
+    w=[]
+
+    for i in range(10000):
+        longr=np.random.uniform(low=212-360,high=36,size=nn)
+        latr=np.random.uniform(low=-5,high=5,size=nn)
+        rar,decr=ga2equ(longr,latr)
+        ii_rand=DeclRaToIndex(decr,rar,256)
+        v.append(np.mean(mapf[ii_rand]))
+        w.append(np.sum(wmapf[ii_rand])/np.sum(wf[ii_rand]))
     
-sig=hp.read_map("text/sigmamap.fits.gz",0)
-wmapf=mapf/sig**2
-wf=(1-mask)/sig**2
-print('sigma mean on HZOA %g ; mean in mask %g' %
-      (np.sum(wmapf[ii_hzoa])/np.sum(wf[ii_hzoa]),
-       np.sum(wmapf)/np.sum(wf)))
+    np.savetxt('dist_hzoa.txt',np.transpose([np.sort(v),(np.arange(len(v))+1.0)/len(v)]))
+    np.savetxt('sdist_hzoa.txt',np.transpose([np.sort(w),(np.arange(len(w))+1.0)/len(w)]))
 
-nn=len(l)
-v=[]
-w=[]
-
-for i in range(10000):
-    longr=np.random.uniform(low=212-360,high=36,size=nn)
-    latr=np.random.uniform(low=-5,high=5,size=nn)
-    rar,decr=ga2equ(longr,latr)
-    ii_rand=DeclRaToIndex(decr,rar,256)
-    v.append(np.mean(mapf[ii_rand]))
-    w.append(np.sum(wmapf[ii_rand])/np.sum(wf[ii_rand]))
-    
-np.savetxt('dist_hzoa.txt',np.transpose([np.sort(v),(np.arange(len(v))+1.0)/len(v)]))
-np.savetxt('sdist_hzoa.txt',np.transpose([np.sort(w),(np.arange(len(w))+1.0)/len(w)]))
-
-print('v: %g %g' % (np.mean(v),np.std(v)))
-print('w: %g %g' % (np.mean(w),np.std(w)))
+    print('v: %g %g' % (np.mean(v),np.std(v)))
+    print('w: %g %g' % (np.mean(w),np.std(w)))
 
 
 ra2,dec2,l2, b2 = np.loadtxt("leda.txt",usecols=[3,4,7,8],unpack=True,skiprows=1)
@@ -112,7 +181,9 @@ ii_leda=DeclRaToIndex(dec2,ra2,256)
 print('mean on LEDA %g' %
       np.mean((map*(1-mask))[ii_leda]))
 
-hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
+hp.mollview(maphzoa,coord=['C','G'],title='')
+print('total maphzoa=%g' % np.sum(maphzoa))
+# hp.mollview(np.where(map>0.01,np.log10(map),-2)+2,coord=['C','G'],title='')
 hp.graticule()
 # keep=np.logical_and(v>4500,v<5500)
 # x=x[keep]
