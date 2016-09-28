@@ -37,6 +37,9 @@
 \begin{abstract}
 \end{abstract}
 
+\section{Introduction}
+\label{sec:introduction}
+
 \section{The Tecnhique}
 \label{sec:tecnhique}
 The technique is straightforward to describe and to implement, and we
@@ -156,6 +159,7 @@ guess at the hidden structures.
 \end{figure}
 
 \subsection{Observed Maps}
+\label{sec:observed-maps}
 
 Here we will discuss in further detail the tests that we performed in
 \citet{2016MNRAS.462.1085A}.  To summarize we determine the region
@@ -170,7 +174,9 @@ Both of these masks are nearly the same, so we combine them.
 To demonstrate its efficacy here, we will first apply the procedure to
 a galaxy map that has an additional mask as depicted in
 Fig.~\ref{fig:infilling_test}.  We have masked both the Galactic plane
-and the equatorial plane.  These equatorial region outside the
+and within five degrees of the equatorial plane. This is the same
+width as the HZOA survey \citep{2016AJ....151...52S} that we will
+examine in \S~\ref{sec:results}.  This equatorial region outside the
 Galactic plane is our test region where we know the underlying galaxy
 distribution, and we attempt to reconstruct it from the data outside
 the masked regions.  Most of the structures within the equatorial
@@ -248,6 +254,7 @@ coefficient.
 \end{figure}
 
 \section{Results}
+\label{sec:results}
 
 After demonstrating the efficacy of the infilling procedure, we now
 perform the calculation to infill only through the Galactic plane (we
@@ -341,6 +348,7 @@ of the underlying galaxy distribution.
 %% }
 
 \section{Discussion}
+\label{sec:discussion}
 
 
 \bibliography{infill}
