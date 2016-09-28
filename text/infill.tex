@@ -92,7 +92,7 @@ contribute to the residual and does not influence the solution.
 However, the spherical harmonics that contribute to the data near the
 edge of the mask do influence the guess within the masked region.
 
-fake test gives R=0.70
+% fake test gives R=0.70
 
 \section{Tests}
 \label{sec:tests}
@@ -222,6 +222,31 @@ expect by chance.
   \label{fig:shift_test}
 \end{figure}
 
+The reason that we would like an infilled map is that we would like to
+optimize a survey of the infilled region to find the galaxies within
+it.  The most efficient observing plan would be to follow the observed
+galaxy distribution as in \citet{2016MNRAS.462.1085A}.  This strategy
+is plotted in Fig.~\ref{fig:test_dist} in green.  By surveying 37\% of
+the solid angle, one can find 50\% of the galaxies, a 35\% increase in
+efficiency.  The red curve depicts the recovery rate by following the
+reconstructed distribution in the region.  By observing 46\% of the
+reconstructed region, one can find 50\% of the galaxies, an increase
+in efficiency of about nine percent relative to an random observing
+plan.  By infilling the map, we can recover about 25\% of the
+efficiency gain that we would have had if we knew the galaxy
+distribution. In fact the cumulative distribution using the infilled
+map is well approximated by using 25\% of the true galaxy distribution
+(the green curve) and 75\% from the uniform distribution (black line),
+so in a very concrete sense, the reconstruction recovers about one
+quarter of the data, approximately the same as the Pearson correlation
+coefficient.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{test_dist}
+  \caption{Fraction of galaxies found in the test region using the infilled data to develop the observing plan (red) and the real data (green)
+ as a function of the solid angle surveyed. }
+  \label{fig:test_dist}
+\end{figure}
+
 \section{Results}
 
 After demonstrating the efficacy of the infilling procedure, we now
@@ -249,7 +274,7 @@ structures correspond to high signal-to-noise regions.
     by determining the regions where the galaxy density is less than
     one tenth of the mean or the star density lies above a given
     threshold (see text for details).  The box shows the region surveyed by
-    \cite{2016AJ....151...52S}.  The region to the left of the dashed vertical line
+    \citep{2016AJ....151...52S}.  The region to the left of the dashed vertical line
     is our test region.    Middle: the infilled galaxy
     distribution. Lower: The standard deviation of the infilled map
     obtained by bootstrapping the galaxy catalogue.}
@@ -274,36 +299,46 @@ the observed galaxies is striking.
   \label{fig:hzoa_map}
 \end{figure}
 To quantify this correspondance we use the infilled galaxy map to
-generate an observing plan and to determine what fraction of the area
-must be surveyed to find a given fraction of the galaxies.
-Fig.~\ref{fig:hzoa_cum} shows the fraction of the HZOA survey region
-that would have to be observed to find a given fraction of the HZOA
-galaxies (the red curve) if we use the infilled galaxy map as a guide.
-To recover half of the galaxies in the survey would require observing
-just 47\% of the survey region, a 6\% gain in efficiency.  To recover
-80\% of the galaxies requires surveying 72.5\% of the region, a 10\%
-gain.  There are a few important points to keep in mind. We have used
-the approximate photometric redshifts from the 2-MASS Photometric
-Redshift Survey to estimate the density of galaxies in the redshift
-range of 0.01 to 0.02 well outside the HZOA survey region.  Next we
-extend this map into a region with no information using the data
-outside to achieve a 10\% increase in the survey efficiency to find the bulk of the galaxies in the set redshift range.
-
+generate an observing plan as in \citet{2016MNRAS.462.1085A} and to
+determine what fraction of the area must be surveyed to find a given
+fraction of the galaxies.  Fig.~\ref{fig:hzoa_cum} shows the fraction
+of the HZOA survey region that would have to be observed to find a
+given fraction of the HZOA galaxies (the green curve) if we use the
+infilled galaxy map as a guide.  To recover half of the galaxies in
+the survey would require observing just 47\% of the survey region, a
+6\% gain in efficiency.  To recover 80\% of the galaxies requires
+surveying 72.5\% of the region, a 10\% gain.  There are a few
+important points to keep in mind.  We have used the approximate
+photometric redshifts from the 2-MASS Photometric Redshift Survey to
+estimate the density of galaxies in the redshift range of 0.01 to 0.02
+well outside the HZOA survey region.  Next we extend this map into a
+region with no information using the data outside to achieve a 10\%
+increase in the survey efficiency to find the bulk of the galaxies in
+the set redshift range.  We have also plotted the results from the
+test in which we masked a region of sky, reconstructed and compared it
+back to the data.  The red curve shows the efficiency of finding the
+galaxies in that reconstruction, and we see that it is similar to
+results here, so the tests depicted in Fig.~\ref{fig:infilling_test}
+through Fig.~\ref{fig:test_dist} yield results similar to those where
+we actually compare an infilled map through the Galactic plane with
+some measurement of the galaxies behind it.  The infilling of the
+Galactic plane in some sense recovers about 25\% of the information
+of the underlying galaxy distribution.
 \begin{figure}
   \includegraphics[width=\columnwidth]{hzoa_cum}
-  \caption{Fraction of Galaxies found in the HZOA survey (red) and in the infilled map (green) as a function of the area surveyed}.
+  \caption{Fraction of galaxies found in the HZOA survey (green) as a function of the solid surveyed.  The red curve is the same as the red curve in Fig.~\ref{fig:test_dist}.}.
   \label{fig:hzoa_cum}
 \end{figure}
 
 
-{\bf How to quantify this
-  in a better way?  If we pick 365 points at random they will not do
-  as well as corresponding to our map as the real galaxies.  But what
-  we want is to ask if we use our map to find galaxies in the region,
-  how well do we get the observed galaxies?  Perhaps we should focus
-  on telescope fields.  How many random fields to observe to get half
-  of the galaxies vs how many fields to observe following the obsplan?
-}
+%% {\bf How to quantify this
+%%   in a better way?  If we pick 365 points at random they will not do
+%%   as well as corresponding to our map as the real galaxies.  But what
+%%   we want is to ask if we use our map to find galaxies in the region,
+%%   how well do we get the observed galaxies?  Perhaps we should focus
+%%   on telescope fields.  How many random fields to observe to get half
+%%   of the galaxies vs how many fields to observe following the obsplan?
+%% }
 
 \section{Discussion}
 
